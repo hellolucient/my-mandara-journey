@@ -15,16 +15,17 @@ export const sampleStory: Story = {
   narrative:
     "Novita began with Mandara in November 2024, training in Sanur, Bali for about three months including on-the-job training, plus a month at Hilton Nusa Dua. In June 2025 she left Bali for the Maldives, spending around seven months at Adaaran Vadoo before joining Barceló Nasandhura in Malé in December 2025. In April 2026 she bought her younger sibling a motorcycle to go to school, and she plans to return to the Maldives to continue her contract.",
   photos: [
-    "/sample/garden.svg",
-    "/sample/gathering.svg",
-    "/sample/shore.svg",
-    "/sample/water.svg",
+    { src: "/sample/garden.svg", x: 50, y: 40, zoom: 1 },
+    { src: "/sample/gathering.svg", x: 50, y: 40, zoom: 1 },
+    { src: "/sample/shore.svg", x: 50, y: 45, zoom: 1 },
+    { src: "/sample/water.svg", x: 50, y: 40, zoom: 1 },
   ],
   events: [
     {
       id: "novita-1",
       kind: "training",
-      dateLabel: "Nov 2024",
+      date: "2024-11-01",
+      dateLabel: "1 Nov 2024",
       title: "Training begins in Sanur, Bali",
       detail: "about three months including OJT",
       placeId: "sanur",
@@ -33,7 +34,8 @@ export const sampleStory: Story = {
     {
       id: "novita-2",
       kind: "training",
-      dateLabel: "In training",
+      date: "2025-01-15",
+      dateLabel: "15 Jan 2025",
       title: "A month of training at Hilton Nusa Dua, then back to Sanur",
       detail: "",
       placeId: "nusa-dua",
@@ -42,6 +44,7 @@ export const sampleStory: Story = {
     {
       id: "novita-3",
       kind: "posting",
+      date: "2025-06-20",
       dateLabel: "20 Jun 2025",
       title: "Left Bali for the Maldives",
       detail: "Adaaran Vadoo Resort for around seven months",
@@ -51,7 +54,8 @@ export const sampleStory: Story = {
     {
       id: "novita-4",
       kind: "posting",
-      dateLabel: "Dec 2025",
+      date: "2025-12-01",
+      dateLabel: "1 Dec 2025",
       title: "Barceló Nasandhura, Malé — the journey continues",
       detail: "",
       placeId: "male",
@@ -60,7 +64,8 @@ export const sampleStory: Story = {
     {
       id: "novita-5",
       kind: "achievement",
-      dateLabel: "Apr 2026",
+      date: "2026-04-01",
+      dateLabel: "1 Apr 2026",
       title: "Bought my younger sibling a motorcycle to go to school",
       detail: "",
       placeId: "",
@@ -69,6 +74,7 @@ export const sampleStory: Story = {
     {
       id: "novita-6",
       kind: "next",
+      date: "",
       dateLabel: "Next",
       title: "Back to the Maldives to continue my contract",
       detail: "",

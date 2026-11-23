@@ -6,6 +6,7 @@ import Link from "next/link";
 import { deleteStory, saveStory, type FormState } from "@/lib/actions";
 import { draftNarrative } from "@/lib/narrative";
 import { PLACES, placeById } from "@/lib/places";
+import { PhotoEditor } from "@/components/framed-photo";
 import { CardFront } from "@/components/story-card";
 import { SheetScaler } from "@/components/sheet-scaler";
 import { Button } from "@/components/ui/button";
@@ -14,11 +15,20 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   KIND_LABEL,
+  ROLES,
   blankEvent,
+  formatEventDate,
+  formatSince,
+  MAX_PHOTO_BYTES,
+  MAX_PHOTOS,
+  PHOTO_SIZE_LABEL,
+  photoFromSrc,
+  toMonthValue,
   type EventKind,
   type Pronoun,
   type Story,
   type StoryEvent,
+  type StoryPhoto,
 } from "@/lib/types";
 
 type Draft = {
@@ -32,7 +42,7 @@ type Draft = {
   pronoun: Pronoun;
   quote: string;
   narrative: string;
-  photos: string[];
+  photos: StoryPhoto[];
   events: StoryEvent[];
 };
 
@@ -83,7 +93,8 @@ export function StoryForm({ initial }: { initial: Draft }) {
   const [propertyName, setPropertyName] = useState(initial.propertyName);
   const [locationLabel, setLocationLabel] = useState(initial.locationLabel);
   const [placeId, setPlaceId] = useState(initial.placeId);
-  const [sinceLabel, setSinceLabel] = useState(initial.sinceLabel);
+  const parsedSince = toMonthValue(initial.sinceLabel);
+  const [sinceLabel, setSinceLabel] = useState(parsedSince);
   const [pronoun, setPronoun] = useState<Pronoun>(initial.pronoun);
   const [quote, setQuote] = useState(initial.quote);
   const [narrative, setNarrative] = useState(initial.narrative);
@@ -103,7 +114,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
       propertyName,
       locationLabel,
       placeId,
-      sinceLabel,
+      sinceLabel: sinceLabel || initial.sinceLabel,
       pronoun,
       quote,
       narrative,
@@ -111,7 +122,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
       events,
       updatedAt: "",
     }),
-    [events, initial.id, locationLabel, name, narrative, photos, placeId, pronoun, propertyName, quote, role, sinceLabel],
+    [events, initial.id, initial.sinceLabel, locationLabel, name, narrative, photos, placeId, pronoun, propertyName, quote, role, sinceLabel],
   );
 
   function updateEvent(id: string, patch: Partial<StoryEvent>) {
@@ -132,11 +143,16 @@ export function StoryForm({ initial }: { initial: Draft }) {
   async function onPhotos(fileList: FileList | null) {
     if (!fileList?.length) return;
     setPhotoError("");
-    const room = 4 - photos.length;
+    const room = MAX_PHOTOS - photos.length;
     const files = Array.from(fileList).slice(0, room);
     try {
-      const next: string[] = [];
-      for (const file of files) next.push(await compressImage(file));
+      const next: StoryPhoto[] = [];
+      for (const file of files) {
+        if (file.size > MAX_PHOTO_BYTES) {
+          throw new Error(`${file.name || "That photograph"} is larger than ${PHOTO_SIZE_LABEL}.`);
+        }
+        next.push(photoFromSrc(await compressImage(file)));
+      }
       setPhotos((current) => [...current, ...next].slice(0, 4));
     } catch (error) {
       setPhotoError(error instanceof Error ? error.message : "Could not add that photograph.");
@@ -164,7 +180,20 @@ export function StoryForm({ initial }: { initial: Draft }) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="role">Role</Label>
-              <Input id="role" name="role" value={role} onChange={(event) => setRole(event.target.value)} className="h-11 bg-[#f7f3ea]" />
+              <select
+                id="role"
+                name="role"
+                value={role}
+                onChange={(event) => setRole(event.target.value)}
+                className="h-11 w-full rounded-lg border border-[#ddcfba] bg-[#f7f3ea] px-3 text-sm"
+              >
+                {(ROLES as readonly string[]).includes(role) ? null : <option value={role}>{role}</option>}
+                {ROLES.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="pronoun">Story voice</Label>
@@ -228,12 +257,15 @@ export function StoryForm({ initial }: { initial: Draft }) {
               <Label htmlFor="sinceLabel">With Mandara since</Label>
               <Input
                 id="sinceLabel"
-                name="sinceLabel"
+                name={sinceLabel ? "sinceLabel" : undefined}
+                type="month"
                 value={sinceLabel}
                 onChange={(event) => setSinceLabel(event.target.value)}
-                placeholder="November 2024"
                 className="h-11 bg-[#f7f3ea]"
               />
+              {!sinceLabel && initial.sinceLabel ? (
+                <input type="hidden" name="sinceLabel" value={initial.sinceLabel} />
+              ) : null}
             </div>
           </div>
         </section>
@@ -241,7 +273,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
         <section className="space-y-3">
           <div>
             <h2 className="font-display text-3xl text-[#1a3f36]">The quote</h2>
-            <p className="mt-1 text-sm text-[#5e6b64]">A short line, in their own voice. It sits under the name.</p>
+            <p className="mt-1 text-sm text-[#5e6b64]">A short line, in their own voice. Two lines fit on the wall card.</p>
           </div>
           <Textarea
             name="quote"
@@ -258,26 +290,25 @@ export function StoryForm({ initial }: { initial: Draft }) {
         <section className="space-y-3">
           <div>
             <h2 className="font-display text-3xl text-[#1a3f36]">Photographs</h2>
-            <p className="mt-1 text-sm text-[#5e6b64]">Up to four. They fill the front of the card.</p>
+            <p className="mt-1 text-sm text-[#5e6b64]">
+              Up to four photographs, {PHOTO_SIZE_LABEL} each. Drag a photo to choose the part that shows, and use zoom when you only want a detail. Two photos stay as portraits, so they are not sliced in half.
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {photos.map((src, index) => (
-              <div key={`${index}-${src.slice(0, 24)}`} className="relative aspect-square overflow-hidden rounded-2xl bg-[#e7efe6]">
-                {/* Data URLs are composed in the browser and are not optimized assets. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="" className="h-full w-full object-cover" />
-                <button
-                  type="button"
-                  className="absolute top-2 right-2 rounded-full bg-[#f7f3ea]/90 px-2 py-1 text-xs text-[#1e4038]"
-                  onClick={() => setPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index))}
-                >
-                  Remove
-                </button>
-              </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {photos.map((photo, index) => (
+              <PhotoEditor
+                key={`${index}-${photo.src.slice(0, 24)}`}
+                photo={photo}
+                onChange={(next) =>
+                  setPhotos((current) => current.map((item, photoIndex) => (photoIndex === index ? next : item)))
+                }
+                onRemove={() => setPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index))}
+              />
             ))}
-            {photos.length < 4 ? (
-              <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] text-center text-sm text-[#5e6b64]">
+            {photos.length < MAX_PHOTOS ? (
+              <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-4 text-center text-sm text-[#5e6b64]">
                 Add a photo
+                <span className="mt-1 text-xs">{PHOTO_SIZE_LABEL} maximum</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -346,11 +377,17 @@ export function StoryForm({ initial }: { initial: Draft }) {
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label>When</Label>
+                    <Label>Date</Label>
                     <Input
-                      value={event.dateLabel}
-                      onChange={(change) => updateEvent(event.id, { dateLabel: change.target.value })}
-                      placeholder="Nov 2024"
+                      type="date"
+                      value={event.date}
+                      onChange={(change) => {
+                        const date = change.target.value;
+                        updateEvent(event.id, {
+                          date,
+                          dateLabel: date ? formatEventDate({ ...event, date, dateLabel: "" }) : "",
+                        });
+                      }}
                       className="h-10 bg-white"
                     />
                   </div>
@@ -427,7 +464,9 @@ export function StoryForm({ initial }: { initial: Draft }) {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="font-display text-3xl text-[#1a3f36]">The paragraph</h2>
-              <p className="mt-1 text-sm text-[#5e6b64]">This is the story on the back of the card. About 700 characters fit comfortably.</p>
+              <p className="mt-1 text-sm text-[#5e6b64]">
+                Kept with the story on the desk. The wall card uses the quote, the photographs, the map, and the timeline.
+              </p>
             </div>
             <Button
               type="button"
@@ -437,7 +476,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
                 setNarrative(
                   draftNarrative({
                     name,
-                    sinceLabel,
+                    sinceLabel: formatSince(sinceLabel || initial.sinceLabel),
                     pronoun,
                     events,
                   }),
@@ -475,7 +514,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
       </form>
 
       <aside className="no-print min-w-0 space-y-4 xl:sticky xl:top-6">
-        <p className="text-[11px] tracking-[0.18em] text-[#6d6458] uppercase">Front, as you type</p>
+        <p className="text-[11px] tracking-[0.18em] text-[#6d6458] uppercase">Wall card, as you type</p>
         <SheetScaler>
           <CardFront story={preview} />
         </SheetScaler>

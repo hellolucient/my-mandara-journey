@@ -7,6 +7,7 @@ import {
   type Pronoun,
   type Story,
   type StoryEvent,
+  type StoryPhoto,
 } from "@/lib/types";
 
 type StoryRow = {
@@ -39,16 +40,36 @@ function asArray(value: unknown): unknown[] {
   return [];
 }
 
-function cleanPhotos(value: unknown): string[] {
-  const photos: string[] = [];
+function cleanSource(value: unknown): string {
+  if (typeof value !== "string") return "";
+  const sample = /^\/sample\/[a-z0-9-]+\.svg$/.test(value);
+  const upload = value.startsWith("data:image/jpeg;base64,") || value.startsWith("data:image/png;base64,");
+  if (!sample && !upload) return "";
+  if (upload && value.length > 1_400_000) return "";
+  return value;
+}
+
+function clampUnit(value: unknown, fallback: number): number {
+  const number = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(100, Math.max(0, number));
+}
+
+function cleanPhotos(value: unknown): StoryPhoto[] {
+  const photos: StoryPhoto[] = [];
   for (const item of asArray(value)) {
-    if (typeof item !== "string") continue;
-    const sample = /^\/sample\/[a-z0-9-]+\.svg$/.test(item);
-    const upload =
-      item.startsWith("data:image/jpeg;base64,") || item.startsWith("data:image/png;base64,");
-    if (!sample && !upload) continue;
-    if (upload && item.length > 1_400_000) continue;
-    photos.push(item);
+    const record = typeof item === "string" ? { src: item } : item;
+    if (!record || typeof record !== "object") continue;
+    const src = cleanSource("src" in record ? (record as { src?: unknown }).src : item);
+    if (!src) continue;
+    const zoomRaw = "zoom" in record ? Number((record as { zoom?: unknown }).zoom) : 1;
+    const zoom = Number.isFinite(zoomRaw) ? Math.min(3, Math.max(1, zoomRaw)) : 1;
+    photos.push({
+      src,
+      x: clampUnit("x" in record ? (record as { x?: unknown }).x : 50, 50),
+      y: clampUnit("y" in record ? (record as { y?: unknown }).y : 32, 32),
+      zoom,
+    });
     if (photos.length === 4) break;
   }
   return photos;
@@ -67,10 +88,12 @@ function cleanEvents(value: unknown): StoryEvent[] {
     const detail = clip(record.detail, 180);
     const dateLabel = clip(record.dateLabel, 40);
     const placeLabel = clip(record.placeLabel, 80);
-    if (!title && !detail && !dateLabel) continue;
+    const date = typeof record.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(record.date) ? record.date : "";
+    if (!title && !detail && !dateLabel && !date) continue;
     events.push({
       id: typeof record.id === "string" && record.id.length < 80 ? record.id : crypto.randomUUID(),
       kind,
+      date,
       dateLabel,
       title,
       detail,
@@ -138,7 +161,7 @@ export type StoryInput = {
   pronoun: Pronoun;
   quote: string;
   narrative: string;
-  photos: string[];
+  photos: StoryPhoto[];
   events: StoryEvent[];
 };
 
@@ -148,7 +171,7 @@ export function parseStoryForm(formData: FormData): { input: StoryInput } | { er
   const pronounValue = String(formData.get("pronoun") ?? "she");
   const pronoun = PRONOUNS.includes(pronounValue as Pronoun) ? (pronounValue as Pronoun) : "she";
   const placeIdRaw = String(formData.get("placeId") ?? "");
-  let photos: string[] = [];
+  let photos: StoryPhoto[] = [];
   let events: StoryEvent[] = [];
   try {
     photos = cleanPhotos(JSON.parse(String(formData.get("photos") ?? "[]")));

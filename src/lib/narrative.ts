@@ -1,4 +1,4 @@
-import type { Pronoun, StoryEvent } from "@/lib/types";
+import { formatEventDate, type Pronoun, type StoryEvent } from "@/lib/types";
 
 function lowerFirst(value: string): string {
   const text = value.trim();
@@ -52,7 +52,7 @@ export function draftNarrative(input: {
       sentences.push(`${name} plans to ${lowerFirst(title)}.`);
       continue;
     }
-    const when = event.dateLabel.trim();
+    const when = formatEventDate(event);
     const place = event.placeLabel.trim();
     const whenBit =
       when && when.toLowerCase() !== "next"

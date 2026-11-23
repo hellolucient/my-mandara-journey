@@ -29,7 +29,7 @@ export default async function DeskPage() {
         <div className="mt-10 max-w-xl rounded-3xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-6 py-10">
           <h2 className="font-display text-3xl text-[#1a3f36]">No one here yet</h2>
           <p className="mt-2 leading-relaxed text-[#3d4f48]">
-            Add a name, a quote, a few photographs, and the timeline: training, each posting, an achievement, and what is next. The story card is A5, with a journey map on the back.
+            Add a name, a role, a quote, a few photographs, and the timeline: training, each posting, an achievement, and what is next. The story card is one side of A5, ready to pin on the wall.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/desk/new" className="inline-flex h-11 items-center rounded-full bg-[#1e4038] px-5 text-sm text-[#f6f1e6]">
@@ -48,7 +48,7 @@ export default async function DeskPage() {
                 {story.photos[0] ? (
                   // Data URLs from the desk are not served through the image optimizer.
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={story.photos[0]} alt="" className="size-20 rounded-2xl object-cover" />
+                  <img src={story.photos[0].src} alt="" className="size-20 rounded-2xl object-cover" />
                 ) : (
                   <div className="font-display grid size-20 place-items-center rounded-2xl bg-[#e7efe6] text-2xl text-[#1e4038]">
                     {story.name.slice(0, 1)}

@@ -144,7 +144,7 @@ export function JourneyMap({ story }: { story: Story }) {
             <circle cx={current.x} cy={current.y} r="26" fill="#f7f3ea" stroke="#1e4038" strokeWidth="2" />
             {photo ? (
               <image
-                href={photo}
+                href={photo.src}
                 x={current.x - 22}
                 y={current.y - 22}
                 width="44"
