@@ -48,7 +48,7 @@ export function SetupForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="username">Username</Label>
+        <Label htmlFor="username">Choose a username</Label>
         <Input
           id="username"
           name="username"
@@ -61,7 +61,7 @@ export function SetupForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">Choose a password</Label>
         <Input
           id="password"
           name="password"
@@ -71,7 +71,7 @@ export function SetupForm() {
           autoComplete="new-password"
           className="h-11 bg-[#f7f3ea]"
         />
-        <p className="text-xs text-[#6d6458]">At least 8 characters. You will share logins like this with the other managers.</p>
+        <p className="text-xs text-[#6d6458]">At least 8 characters. This is the password you will use to sign in.</p>
       </div>
       <GateError state={state} />
       <Submit>Open the desk</Submit>
@@ -108,6 +108,9 @@ export function LoginForm() {
       </div>
       <GateError state={state} />
       <Submit>Sign in</Submit>
+      <p className="text-xs leading-relaxed text-[#6d6458]">
+        A username only works after it has been created. The first one is chosen on the opening screen.
+      </p>
     </form>
   );
 }

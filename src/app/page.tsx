@@ -26,8 +26,8 @@ export default async function HomePage() {
         </h1>
         <p className="mt-4 max-w-md text-base leading-relaxed text-[#3d4f48]">
           {firstDesk
-            ? "Create the first desk login. After that, you can make a username and password for each spa manager."
-            : "Sign in, then add someone on your team: her name, a quote, a few photographs, and the places she has worked. The card prints at A5."}
+            ? "There isn’t a login yet. Choose a username and password for yourself, then add one for each spa manager."
+            : "Sign in with the username and password created for your property. Then add someone on your team and print their A5 card."}
         </p>
         <div className="mt-8 max-w-md">{firstDesk ? <SetupForm /> : <LoginForm />}</div>
       </section>
