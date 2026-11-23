@@ -324,7 +324,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
               />
             ))}
             {photos.length < MAX_PHOTOS ? (
-              <label className="flex aspect-[5/2] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-4 text-center text-sm text-[#5e6b64]">
+              <label className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-4 text-center text-sm text-[#5e6b64]">
                 Add a photo
                 <span className="mt-1 text-xs">Reduced to under {PHOTO_SIZE_LABEL}</span>
                 <input

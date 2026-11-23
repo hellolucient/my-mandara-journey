@@ -12,10 +12,10 @@ function PhotoRow({ photos }: { photos: StoryPhoto[] }) {
     <div className="grid grid-cols-3 gap-1.5">
       {slots.map((photo, index) =>
         photo ? (
-          <FramedPhoto key={`${photo.src.slice(0, 24)}-${index}`} photo={photo} className="aspect-[5/2] rounded-xl" />
+          <FramedPhoto key={`${photo.src.slice(0, 24)}-${index}`} photo={photo} className="aspect-[4/3] rounded-xl" />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img key={FILLERS[index]} src={FILLERS[index]} alt="" className="aspect-[5/2] w-full rounded-xl object-cover" />
+          <img key={FILLERS[index]} src={FILLERS[index]} alt="" className="aspect-[4/3] w-full rounded-xl object-cover" />
         ),
       )}
     </div>
@@ -92,15 +92,15 @@ export function CardFront({ story, sample = false }: { story: Story; sample?: bo
         <p className="font-serif mt-1 text-[13px] text-[#7a6d5e] italic">A quote sits here.</p>
       )}
 
-      <div className="mt-1.5 grid min-h-0 flex-1 grid-cols-[0.9fr_1.1fr] gap-2 text-left">
-        <div className="min-h-0 overflow-hidden rounded-xl bg-[#d5e3dc]">
+      <div className="mt-1.5 grid min-h-0 flex-1 grid-cols-[28mm_minmax(0,1fr)] items-start gap-2.5 text-left">
+        <div className="h-[24mm] overflow-hidden rounded-lg bg-[#d5e3dc]">
           <JourneyMap story={story} />
         </div>
         <div className="min-h-0 overflow-hidden">
           {story.narrative.trim() ? (
-            <p className="font-serif line-clamp-7 text-[11px] leading-snug text-[#243833]">{story.narrative}</p>
+            <p className="font-serif line-clamp-8 text-[12.5px] leading-snug text-[#243833]">{story.narrative}</p>
           ) : (
-            <p className="font-serif text-[11.5px] text-[#7a6d5e] italic">The story sits here.</p>
+            <p className="font-serif text-[12.5px] text-[#7a6d5e] italic">The story sits here.</p>
           )}
         </div>
       </div>
