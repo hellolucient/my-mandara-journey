@@ -3,12 +3,16 @@ import { MAP, journeyStops, project } from "@/lib/places";
 import type { Story } from "@/lib/types";
 
 const LABELS = [
-  { name: "INDIA", lon: 78.2, lat: 16.2 },
-  { name: "THAILAND", lon: 101.2, lat: 15.2 },
+  { name: "INDIA", lon: 77.6, lat: 9.2 },
+  { name: "THAILAND", lon: 101.4, lat: 8.6 },
   { name: "SRI LANKA", lon: 80.6, lat: 7.4 },
   { name: "BORNEO", lon: 114.2, lat: 1.6 },
   { name: "INDIAN OCEAN", lon: 90, lat: 0.2, ocean: true },
 ];
+
+// The drawn land continues past the top of the sheet and gets sliced off.
+// This window drops that cut band so the journey fills the frame.
+const VIEW = { x: 24, y: 150, width: 752, height: 340 };
 
 function shorten(value: string, max: number): string {
   const text = value.trim();
@@ -17,7 +21,14 @@ function shorten(value: string, max: number): string {
 }
 
 export function JourneyMap({ story }: { story: Story }) {
-  const stops = journeyStops(story.events, story.placeId);
+  const stops = journeyStops(story.events, story.placeId).map((stop) => {
+    const pad = 22;
+    return {
+      ...stop,
+      x: Math.min(VIEW.x + VIEW.width - pad, Math.max(VIEW.x + pad, stop.x)),
+      y: Math.min(VIEW.y + VIEW.height - 36, Math.max(VIEW.y + pad, stop.y)),
+    };
+  });
   const route = stops.map((stop, index) => `${index === 0 ? "M" : "L"}${stop.x.toFixed(1)} ${stop.y.toFixed(1)}`).join(" ");
   const current = stops[stops.length - 1];
   const photo = story.photos[0];
@@ -35,7 +46,8 @@ export function JourneyMap({ story }: { story: Story }) {
 
   return (
     <svg
-      viewBox={`0 0 ${MAP.width} ${MAP.height}`}
+      viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.width} ${VIEW.height}`}
+      preserveAspectRatio="xMidYMid meet"
       className="h-full w-full"
       role="img"
       aria-label={
@@ -202,7 +214,7 @@ export function JourneyMap({ story }: { story: Story }) {
             </g>
           </g>
         ) : null}
-        <g transform="translate(28 418)">
+        <g transform="translate(36 392)">
           <line x1="0" x2={scalePx} y1="8" y2="8" stroke="#5f756b" strokeWidth="1.4" />
           <line x1="0" x2="0" y1="3" y2="13" stroke="#5f756b" strokeWidth="1.4" />
           <line x1={scalePx} x2={scalePx} y1="3" y2="13" stroke="#5f756b" strokeWidth="1.4" />

@@ -6,6 +6,15 @@ import { DOT_COLORS, formatEventDate, formatSince, type Story, type StoryEvent, 
 
 const FILLERS = ["/sample/garden.svg", "/sample/gathering.svg", "/sample/shore.svg"];
 
+function clampLines(lines: number) {
+  return {
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical" as const,
+    WebkitLineClamp: lines,
+    overflow: "hidden",
+  };
+}
+
 function PhotoRow({ photos }: { photos: StoryPhoto[] }) {
   const slots = Array.from({ length: 3 }, (_, index) => photos[index] ?? null);
   return (
@@ -22,12 +31,11 @@ function PhotoRow({ photos }: { photos: StoryPhoto[] }) {
   );
 }
 
-function Timeline({ events }: { events: StoryEvent[] }) {
-  const shown = events.slice(0, 8);
+function TimelineRow({ events, offset }: { events: StoryEvent[]; offset: number }) {
   return (
-    <ol className="grid" style={{ gridTemplateColumns: `repeat(${shown.length}, minmax(0, 1fr))` }}>
-      {shown.map((event, index) => {
-        const color = event.kind === "next" ? "#1e4038" : DOT_COLORS[index % DOT_COLORS.length];
+    <ol className="grid" style={{ gridTemplateColumns: `repeat(${events.length}, minmax(0, 1fr))` }}>
+      {events.map((event, index) => {
+        const color = event.kind === "next" ? "#1e4038" : DOT_COLORS[(offset + index) % DOT_COLORS.length];
         return (
           <li key={event.id} className="min-w-0 px-0.5 text-center">
             <p className="truncate text-[8px] leading-none font-semibold tracking-[0.04em] uppercase" style={{ color }}>
@@ -35,7 +43,7 @@ function Timeline({ events }: { events: StoryEvent[] }) {
             </p>
             <div className="relative my-[3px] flex h-2.5 items-center justify-center">
               {index > 0 ? <span className="absolute top-1/2 right-1/2 left-0 h-px -translate-y-1/2 bg-[#d3c4ae]" /> : null}
-              {index < shown.length - 1 ? (
+              {index < events.length - 1 ? (
                 <span className="absolute top-1/2 right-0 left-1/2 h-px -translate-y-1/2 bg-[#d3c4ae]" />
               ) : null}
               <span
@@ -54,6 +62,18 @@ function Timeline({ events }: { events: StoryEvent[] }) {
   );
 }
 
+function Timeline({ events }: { events: StoryEvent[] }) {
+  const shown = events.slice(0, 8);
+  const rows = shown.length > 4 ? [shown.slice(0, Math.ceil(shown.length / 2)), shown.slice(Math.ceil(shown.length / 2))] : [shown];
+  return (
+    <div className="space-y-1">
+      {rows.map((row, index) => (
+        <TimelineRow key={row[0]?.id ?? index} events={row} offset={index === 0 ? 0 : rows[0].length} />
+      ))}
+    </div>
+  );
+}
+
 export function CardFront({ story, sample = false }: { story: Story; sample?: boolean }) {
   const name = story.name.trim() || "Name";
   const property = story.propertyName.trim();
@@ -62,7 +82,7 @@ export function CardFront({ story, sample = false }: { story: Story; sample?: bo
   const meta = [property, showLocation ? location : ""].filter(Boolean).join("  ·  ");
   const since = formatSince(story.sinceLabel);
   return (
-    <article className="a5-sheet relative flex flex-col px-[5.5mm] pt-[3.5mm] pb-[3.5mm] text-center text-[#1c3330]">
+    <article className="a5-sheet relative flex flex-col px-[5.5mm] pt-[3mm] pb-[3mm] text-center text-[#1c3330]">
       {sample ? (
         <p className="absolute top-[3.2mm] right-[5mm] -rotate-6 border border-dashed border-[#8c6239] px-1.5 py-0.5 text-[8px] tracking-[0.14em] text-[#8c6239] uppercase">
           Sample
@@ -78,29 +98,34 @@ export function CardFront({ story, sample = false }: { story: Story; sample?: bo
         <PhotoRow photos={story.photos} />
       </div>
 
-      <h2 className={`font-display mt-1.5 leading-none text-[#1a3f36] ${name.length > 18 ? "text-[1.45rem]" : "text-[2.05rem]"}`}>
+      <h2 className={`font-display mt-1 leading-none text-[#1a3f36] ${name.length > 18 ? "text-[1.4rem]" : "text-[1.85rem]"}`}>
         {name}
       </h2>
       {meta ? <p className="mt-1 text-[9px] tracking-[0.16em] text-[#3d4f48] uppercase">{meta}</p> : null}
       {since ? <p className="font-serif mt-0.5 text-[11.5px] text-[#8a623c] italic">With Mandara since {since}</p> : null}
 
       {story.quote ? (
-        <blockquote className="font-serif mx-auto mt-1 line-clamp-2 max-w-[94%] text-[13px] leading-snug text-[#1e4038] italic">
+        <blockquote
+          className="font-serif mx-auto mt-1 max-w-[94%] text-[12.5px] leading-snug text-[#1e4038] italic min-h-[2.6em]"
+          style={clampLines(2)}
+        >
           “{story.quote}
         </blockquote>
       ) : (
         <p className="font-serif mt-1 text-[13px] text-[#7a6d5e] italic">A quote sits here.</p>
       )}
 
-      <div className="mt-1.5 grid min-h-0 flex-1 grid-cols-[28mm_minmax(0,1fr)] items-start gap-2.5 text-left">
-        <div className="h-[24mm] overflow-hidden rounded-lg bg-[#d5e3dc]">
+      <div className="mt-1 grid grid-cols-[78mm_minmax(0,1fr)] items-start gap-2.5 text-left">
+        <div className="aspect-[752/340] overflow-hidden rounded-xl bg-[#d5e3dc]">
           <JourneyMap story={story} />
         </div>
-        <div className="min-h-0 overflow-hidden">
+        <div className="min-h-0 overflow-hidden pt-0.5">
           {story.narrative.trim() ? (
-            <p className="font-serif line-clamp-8 text-[12.5px] leading-snug text-[#243833]">{story.narrative}</p>
+            <p className="font-serif text-[11.5px] leading-snug text-[#243833]" style={clampLines(6)}>
+              {story.narrative}
+            </p>
           ) : (
-            <p className="font-serif text-[12.5px] text-[#7a6d5e] italic">The story sits here.</p>
+            <p className="font-serif text-[11.5px] text-[#7a6d5e] italic">The story sits here.</p>
           )}
         </div>
       </div>
