@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="pool" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d5ebe8"/>
+      <stop offset="1" stop-color="#1f6d78"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#pool)"/>
+  <g stroke="#f7f3ea" stroke-width="10" opacity="0.45" stroke-linecap="round">
+    <path d="M120 0c20 80-20 120 10 200s-10 120 20 200-20 140 0 200"/>
+    <path d="M220 0c-10 90 30 130-10 220s20 140-10 220 10 120 20 160"/>
+    <path d="M340 0c16 70-24 130 8 210s-16 150 12 230-8 110 6 150"/>
+    <path d="M460 0c-20 80 20 140-8 230s16 140-12 220 8 100 10 150"/>
+    <path d="M560 0c10 90-20 150 12 240s-8 130 10 210-16 100 4 150"/>
+    <path d="M660 0c-8 70 18 140-10 230s14 150-6 220 10 110 8 150"/>
+  </g>
+  <ellipse cx="400" cy="690" rx="260" ry="36" fill="#143e48" opacity="0.25"/>
+  <text x="400" y="430" text-anchor="middle" fill="#f7f3ea" font-family="Georgia, serif" font-size="54" opacity="0.0"> </text>
+</svg>
