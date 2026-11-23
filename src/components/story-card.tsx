@@ -15,19 +15,13 @@ function clampLines(lines: number) {
   };
 }
 
-function PhotoRow({ photos }: { photos: StoryPhoto[] }) {
-  const slots = Array.from({ length: 3 }, (_, index) => photos[index] ?? null);
+function PhotoSlot({ photo, index }: { photo: StoryPhoto | null; index: number }) {
+  if (photo) {
+    return <FramedPhoto photo={photo} className="aspect-[4/3] rounded-xl" />;
+  }
   return (
-    <div className="grid grid-cols-3 gap-1.5">
-      {slots.map((photo, index) =>
-        photo ? (
-          <FramedPhoto key={`${photo.src.slice(0, 24)}-${index}`} photo={photo} className="aspect-[4/3] rounded-xl" />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img key={FILLERS[index]} src={FILLERS[index]} alt="" className="aspect-[4/3] w-full rounded-xl object-cover" />
-        ),
-      )}
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={FILLERS[index]} alt="" className="aspect-[4/3] w-full rounded-xl object-cover" />
   );
 }
 
@@ -94,38 +88,33 @@ export function CardFront({ story, sample = false }: { story: Story; sample?: bo
         Our Mandara journey
       </p>
 
-      <div className="mt-1.5">
-        <PhotoRow photos={story.photos} />
-      </div>
+      <div className="mt-1.5 grid flex-1 grid-cols-3 content-start gap-x-1.5 gap-y-1.5">
+        {Array.from({ length: 3 }, (_, index) => (
+          <PhotoSlot key={index} photo={story.photos[index] ?? null} index={index} />
+        ))}
 
-      <h2 className={`font-display mt-1 leading-none text-[#1a3f36] ${name.length > 18 ? "text-[1.4rem]" : "text-[1.85rem]"}`}>
-        {name}
-      </h2>
-      {meta ? <p className="mt-1 text-[9px] tracking-[0.16em] text-[#3d4f48] uppercase">{meta}</p> : null}
-      {since ? <p className="font-serif mt-0.5 text-[11.5px] text-[#8a623c] italic">With Mandara since {since}</p> : null}
-
-      {story.quote ? (
-        <blockquote
-          className="font-serif mx-auto mt-1 max-w-[94%] text-[12.5px] leading-snug text-[#1e4038] italic min-h-[2.6em]"
-          style={clampLines(2)}
-        >
-          “{story.quote}
-        </blockquote>
-      ) : (
-        <p className="font-serif mt-1 text-[13px] text-[#7a6d5e] italic">A quote sits here.</p>
-      )}
-
-      <div className="mt-1 grid grid-cols-[78mm_minmax(0,1fr)] items-start gap-2.5 text-left">
-        <div className="aspect-[752/340] overflow-hidden rounded-xl bg-[#d5e3dc]">
+        <div className="aspect-[4/3] self-start overflow-hidden rounded-xl bg-[#d5e3dc]">
           <JourneyMap story={story} />
         </div>
-        <div className="min-h-0 overflow-hidden pt-0.5">
+        <div className="col-span-2 flex min-h-0 flex-col justify-center px-2 text-center">
+          <h2 className={`font-display leading-none text-[#1a3f36] ${name.length > 18 ? "text-[1.35rem]" : "text-[1.7rem]"}`}>
+            {name}
+          </h2>
+          {meta ? <p className="mt-1 text-[9px] tracking-[0.16em] text-[#3d4f48] uppercase">{meta}</p> : null}
+          {since ? <p className="font-serif mt-0.5 text-[11px] text-[#8a623c] italic">With Mandara since {since}</p> : null}
+          {story.quote ? (
+            <blockquote className="font-serif mt-1 text-[16px] leading-snug font-semibold text-[#1e4038] italic" style={clampLines(2)}>
+              “{story.quote}
+            </blockquote>
+          ) : (
+            <p className="font-serif mt-1 text-[16px] font-semibold text-[#7a6d5e] italic">A quote sits here.</p>
+          )}
           {story.narrative.trim() ? (
-            <p className="font-serif text-[11.5px] leading-snug text-[#243833]" style={clampLines(6)}>
+            <p className="font-serif mt-1.5 text-left text-[11px] leading-snug text-[#243833]" style={clampLines(5)}>
               {story.narrative}
             </p>
           ) : (
-            <p className="font-serif text-[11.5px] text-[#7a6d5e] italic">The story sits here.</p>
+            <p className="font-serif mt-1.5 text-[11px] text-[#7a6d5e] italic">The story sits here.</p>
           )}
         </div>
       </div>
