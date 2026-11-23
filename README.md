@@ -1,6 +1,6 @@
 # Mandara journeys
 
-Spa managers sign in, write a short story for someone on their team, and print it as a landscape A5 card. The card is a single sheet for the wall: name, role, resort, quote, story, four photographs, a journey map, and a timeline. Drag each photograph to choose the part that shows. Empty frames are filled with a colour block.
+Spa managers sign in, write a short story for someone on their team, and print it as a landscape A5 card. The card is a single sheet for the wall: three photographs, the name, the resort, how long they have been with Mandara, a quote, then the map, the story, and a timeline that reads across. Drag each photograph to choose the part that shows. Empty frames are filled with a colour block.
 
 ## First visit
 
@@ -13,7 +13,7 @@ Passwords are stored scrambled. A new login’s password is shown once, when you
 1. **Add someone**.
 2. Enter her name, role, current property, and when she joined Mandara.
 3. Paste a quote.
-4. Add up to four photographs. Each one is reduced to under 300 KB, which is enough for a sharp print at this size.
+4. Add up to three photographs. Each one is reduced to under 300 KB, which is enough for a sharp print at this size.
 5. Add the timeline, in order. Pick a place when it should appear on the map.
 6. **Draft from the timeline**, then edit the paragraph so it sounds like her.
 7. **Save and open the card**. Print it, choose **A5 landscape**, and turn on background graphics. The sheet is one side.

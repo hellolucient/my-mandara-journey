@@ -309,7 +309,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
           <div>
             <h2 className="font-display text-3xl text-[#1a3f36]">Photographs</h2>
             <p className="mt-1 text-sm text-[#5e6b64]">
-              Up to four. Each one is reduced to under {PHOTO_SIZE_LABEL}, which is enough for a sharp print at this size. Drag to choose the part that shows. If a frame is empty, the card fills it with a colour block so the row always has four.
+              Up to three, in a row across the top of the card. Each one is reduced to under {PHOTO_SIZE_LABEL}, which is enough for a sharp print at this size. Drag to choose the part that shows. If a frame is empty, the card fills it with a colour block.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -324,7 +324,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
               />
             ))}
             {photos.length < MAX_PHOTOS ? (
-              <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-4 text-center text-sm text-[#5e6b64]">
+              <label className="flex aspect-[5/2] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-4 text-center text-sm text-[#5e6b64]">
                 Add a photo
                 <span className="mt-1 text-xs">Reduced to under {PHOTO_SIZE_LABEL}</span>
                 <input
@@ -348,7 +348,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
             <h2 className="font-display text-3xl text-[#1a3f36]">Timeline</h2>
             <p className="mt-1 text-sm leading-relaxed text-[#5e6b64]">
               Month and year only. When they started training, each place they worked, what they achieved, and what is next.
-              The map draws a line through the places, in this order. The card shows the first six.
+              The map draws a line through the places, in this order. On the card they read across, under the map and the story.
             </p>
           </div>
           <ol className="space-y-4">

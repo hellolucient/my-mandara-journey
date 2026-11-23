@@ -91,7 +91,7 @@ const MONTHS_LONG = [
   "December",
 ];
 
-export const MAX_PHOTOS = 4;
+export const MAX_PHOTOS = 3;
 /** Longest edge kept for the wall card. About 70 mm at 300 dpi, larger than a tile. */
 export const PHOTO_MAX_EDGE = 900;
 /** Stored data-URL ceiling: roughly 300 KB of JPEG, enough for a sharp print at this size. */

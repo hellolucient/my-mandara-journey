@@ -2,6 +2,7 @@ import { sql } from "@/lib/db";
 import { placeById } from "@/lib/places";
 import {
   EVENT_KINDS,
+  MAX_PHOTOS,
   PRONOUNS,
   type EventKind,
   type Pronoun,
@@ -70,7 +71,7 @@ function cleanPhotos(value: unknown): StoryPhoto[] {
       y: clampUnit("y" in record ? (record as { y?: unknown }).y : 32, 32),
       zoom,
     });
-    if (photos.length === 4) break;
+    if (photos.length === MAX_PHOTOS) break;
   }
   return photos;
 }
