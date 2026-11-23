@@ -6,6 +6,7 @@ import { changePassword, createManager, type FormState, type LoginState } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RESORTS } from "@/lib/resorts";
 import type { Manager } from "@/lib/types";
 
 function PendingButton({ children }: { children: string }) {
@@ -40,8 +41,23 @@ export function LoginsPanel({ managers }: { managers: Manager[] }) {
             <Input id="displayName" name="displayName" required className="h-11 bg-[#f7f3ea]" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="propertyName">Property</Label>
-            <Input id="propertyName" name="propertyName" required className="h-11 bg-[#f7f3ea]" placeholder="Mandara Spa, Maldives" />
+            <Label htmlFor="propertyName">Resort</Label>
+            <select
+              id="propertyName"
+              name="propertyName"
+              required
+              defaultValue=""
+              className="h-11 w-full rounded-lg border border-[#ddcfba] bg-[#f7f3ea] px-3 text-sm"
+            >
+              <option value="" disabled>
+                Choose a resort
+              </option>
+              {RESORTS.map((resort) => (
+                <option key={resort.name} value={resort.name}>
+                  {resort.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="username">Username</Label>

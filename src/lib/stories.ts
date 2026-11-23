@@ -88,7 +88,8 @@ function cleanEvents(value: unknown): StoryEvent[] {
     const detail = clip(record.detail, 180);
     const dateLabel = clip(record.dateLabel, 40);
     const placeLabel = clip(record.placeLabel, 80);
-    const date = typeof record.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(record.date) ? record.date : "";
+    const dateMatch = typeof record.date === "string" ? record.date.match(/^(\d{4})-(\d{2})/) : null;
+    const date = dateMatch ? `${dateMatch[1]}-${dateMatch[2]}` : "";
     if (!title && !detail && !dateLabel && !date) continue;
     events.push({
       id: typeof record.id === "string" && record.id.length < 80 ? record.id : crypto.randomUUID(),
@@ -186,7 +187,7 @@ export function parseStoryForm(formData: FormData): { input: StoryInput } | { er
   return {
     input: {
       name,
-      role: clip(formData.get("role"), 80) || "Spa Therapist",
+      role: clip(formData.get("role"), 80) || "Therapist",
       propertyName: clip(formData.get("propertyName"), 80),
       locationLabel: clip(formData.get("locationLabel"), 80),
       placeId: placeById(placeIdRaw) ? placeIdRaw : "",

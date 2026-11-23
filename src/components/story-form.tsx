@@ -6,6 +6,7 @@ import Link from "next/link";
 import { deleteStory, saveStory, type FormState } from "@/lib/actions";
 import { draftNarrative } from "@/lib/narrative";
 import { PLACES, placeById } from "@/lib/places";
+import { RESORTS, resortByName } from "@/lib/resorts";
 import { PhotoEditor } from "@/components/framed-photo";
 import { CardFront } from "@/components/story-card";
 import { SheetScaler } from "@/components/sheet-scaler";
@@ -15,13 +16,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   KIND_LABEL,
+  MAX_PHOTO_DATA_URL,
+  MAX_PHOTOS,
+  PHOTO_MAX_EDGE,
+  PHOTO_SIZE_LABEL,
   ROLES,
   blankEvent,
+  eventMonth,
   formatEventDate,
   formatSince,
-  MAX_PHOTO_BYTES,
-  MAX_PHOTOS,
-  PHOTO_SIZE_LABEL,
   photoFromSrc,
   toMonthValue,
   type EventKind,
@@ -50,27 +53,31 @@ async function compressImage(file: File): Promise<string> {
   if (!file.type.startsWith("image/")) {
     throw new Error("Choose a photograph.");
   }
+  if (file.size > 12 * 1024 * 1024) {
+    throw new Error("That photograph is too heavy to prepare. A normal camera photo is enough.");
+  }
   const bitmap = await createImageBitmap(file);
-  let maxSide = 1400;
-  let quality = 0.72;
+  const steps = [
+    { edge: PHOTO_MAX_EDGE, quality: 0.72 },
+    { edge: 720, quality: 0.64 },
+    { edge: 560, quality: 0.56 },
+  ];
   try {
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    for (const step of steps) {
+      const scale = Math.min(1, step.edge / Math.max(bitmap.width, bitmap.height));
       const canvas = document.createElement("canvas");
       canvas.width = Math.max(1, Math.round(bitmap.width * scale));
       canvas.height = Math.max(1, Math.round(bitmap.height * scale));
       const context = canvas.getContext("2d");
       if (!context) throw new Error("Could not prepare that photograph.");
       context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-      const url = canvas.toDataURL("image/jpeg", quality);
-      if (url.length <= 1_200_000) return url;
-      maxSide = 1000;
-      quality = 0.55;
+      const url = canvas.toDataURL("image/jpeg", step.quality);
+      if (url.length <= MAX_PHOTO_DATA_URL) return url;
     }
   } finally {
     bitmap.close();
   }
-  throw new Error("That photograph is still too large. Try a smaller one.");
+  throw new Error("That photograph could not be reduced for the card. Try another one.");
 }
 
 function SaveButton() {
@@ -100,7 +107,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
   const [narrative, setNarrative] = useState(initial.narrative);
   const [photos, setPhotos] = useState(initial.photos);
   const [events, setEvents] = useState<StoryEvent[]>(
-    initial.events.length ? initial.events : [blankEvent()],
+    (initial.events.length ? initial.events : [blankEvent()]).map(eventMonth),
   );
   const [photoError, setPhotoError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -148,9 +155,6 @@ export function StoryForm({ initial }: { initial: Draft }) {
     try {
       const next: StoryPhoto[] = [];
       for (const file of files) {
-        if (file.size > MAX_PHOTO_BYTES) {
-          throw new Error(`${file.name || "That photograph"} is larger than ${PHOTO_SIZE_LABEL}.`);
-        }
         next.push(photoFromSrc(await compressImage(file)));
       }
       setPhotos((current) => [...current, ...next].slice(0, 4));
@@ -210,15 +214,29 @@ export function StoryForm({ initial }: { initial: Draft }) {
               </select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="propertyName">Property today</Label>
-              <Input
+              <Label htmlFor="propertyName">Resort</Label>
+              <select
                 id="propertyName"
                 name="propertyName"
                 value={propertyName}
-                onChange={(event) => setPropertyName(event.target.value)}
-                placeholder="Barceló Nasandhura"
-                className="h-11 bg-[#f7f3ea]"
-              />
+                onChange={(event) => {
+                  const name = event.target.value;
+                  setPropertyName(name);
+                  const resort = resortByName(name);
+                  if (!resort) return;
+                  setPlaceId(resort.placeId);
+                  setLocationLabel(resort.location);
+                }}
+                className="h-11 w-full rounded-lg border border-[#ddcfba] bg-[#f7f3ea] px-3 text-sm"
+              >
+                {!propertyName ? <option value="">Choose a resort</option> : null}
+                {propertyName && !resortByName(propertyName) ? <option value={propertyName}>{propertyName}</option> : null}
+                {RESORTS.map((resort) => (
+                  <option key={resort.name} value={resort.name}>
+                    {resort.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="locationLabel">Place name on the card</Label>
@@ -291,7 +309,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
           <div>
             <h2 className="font-display text-3xl text-[#1a3f36]">Photographs</h2>
             <p className="mt-1 text-sm text-[#5e6b64]">
-              Up to four photographs, {PHOTO_SIZE_LABEL} each. Drag a photo to choose the part that shows, and use zoom when you only want a detail. Two photos stay as portraits, so they are not sliced in half.
+              Up to four. Each one is reduced to under {PHOTO_SIZE_LABEL}, which is enough for a sharp print at this size. Drag to choose the part that shows. If a frame is empty, the card fills it with a colour block so the row always has four.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -306,9 +324,9 @@ export function StoryForm({ initial }: { initial: Draft }) {
               />
             ))}
             {photos.length < MAX_PHOTOS ? (
-              <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-4 text-center text-sm text-[#5e6b64]">
+              <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-4 text-center text-sm text-[#5e6b64]">
                 Add a photo
-                <span className="mt-1 text-xs">{PHOTO_SIZE_LABEL} maximum</span>
+                <span className="mt-1 text-xs">Reduced to under {PHOTO_SIZE_LABEL}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -329,7 +347,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
           <div>
             <h2 className="font-display text-3xl text-[#1a3f36]">Timeline</h2>
             <p className="mt-1 text-sm leading-relaxed text-[#5e6b64]">
-              When they started training, each place they worked, what they achieved, and what is next.
+              Month and year only. When they started training, each place they worked, what they achieved, and what is next.
               The map draws a line through the places, in this order. The card shows the first six.
             </p>
           </div>
@@ -377,10 +395,10 @@ export function StoryForm({ initial }: { initial: Draft }) {
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Date</Label>
+                    <Label>Month</Label>
                     <Input
-                      type="date"
-                      value={event.date}
+                      type="month"
+                      value={toMonthValue(event.date)}
                       onChange={(change) => {
                         const date = change.target.value;
                         updateEvent(event.id, {
@@ -465,7 +483,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
             <div>
               <h2 className="font-display text-3xl text-[#1a3f36]">The paragraph</h2>
               <p className="mt-1 text-sm text-[#5e6b64]">
-                Kept with the story on the desk. The wall card uses the quote, the photographs, the map, and the timeline.
+                This is the story printed on the card, next to the map. About 700 characters fit.
               </p>
             </div>
             <Button

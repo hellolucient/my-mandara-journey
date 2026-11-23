@@ -14,7 +14,7 @@ export default async function NewStoryPage() {
       <StoryForm
         initial={{
           name: "",
-          role: "Spa Therapist",
+          role: "Therapist",
           propertyName: manager.propertyName,
           locationLabel: "",
           placeId: "",

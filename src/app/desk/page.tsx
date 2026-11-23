@@ -29,7 +29,7 @@ export default async function DeskPage() {
         <div className="mt-10 max-w-xl rounded-3xl border border-dashed border-[#d3c4ae] bg-[#f7f3ea] px-6 py-10">
           <h2 className="font-display text-3xl text-[#1a3f36]">No one here yet</h2>
           <p className="mt-2 leading-relaxed text-[#3d4f48]">
-            Add a name, a role, a quote, a few photographs, and the timeline: training, each posting, an achievement, and what is next. The story card is one side of A5, ready to pin on the wall.
+            Add a name, a role, the resort, a quote, the story, a few photographs, and the timeline. The card is one landscape side of A5, ready to pin on the wall.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/desk/new" className="inline-flex h-11 items-center rounded-full bg-[#1e4038] px-5 text-sm text-[#f6f1e6]">

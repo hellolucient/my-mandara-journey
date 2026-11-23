@@ -52,7 +52,7 @@ export function draftNarrative(input: {
       sentences.push(`${name} plans to ${lowerFirst(title)}.`);
       continue;
     }
-    const when = formatEventDate(event);
+    const when = formatEventDate(event, "long");
     const place = event.placeLabel.trim();
     const whenBit =
       when && when.toLowerCase() !== "next"

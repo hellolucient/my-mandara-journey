@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { login, setupDesk, type FormState } from "@/lib/actions";
+import { RESORTS } from "@/lib/resorts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,14 +39,23 @@ export function SetupForm() {
         <Input id="displayName" name="displayName" required autoComplete="name" className="h-11 bg-[#f7f3ea]" />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="propertyName">Property</Label>
-        <Input
+        <Label htmlFor="propertyName">Resort</Label>
+        <select
           id="propertyName"
           name="propertyName"
           required
-          placeholder="Mandara Spa, Sanur"
-          className="h-11 bg-[#f7f3ea]"
-        />
+          defaultValue=""
+          className="h-11 w-full rounded-lg border border-[#ddcfba] bg-[#f7f3ea] px-3 text-sm"
+        >
+          <option value="" disabled>
+            Choose a resort
+          </option>
+          {RESORTS.map((resort) => (
+            <option key={resort.name} value={resort.name}>
+              {resort.name}
+            </option>
+          ))}
+        </select>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="username">Choose a username</Label>

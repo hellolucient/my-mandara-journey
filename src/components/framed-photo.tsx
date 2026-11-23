@@ -38,7 +38,7 @@ export function PhotoEditor({
   return (
     <div className="space-y-2">
       <div
-        className="relative aspect-[3/4] cursor-grab touch-none overflow-hidden rounded-2xl bg-[#e7efe6] active:cursor-grabbing"
+        className="relative aspect-square cursor-grab touch-none overflow-hidden rounded-2xl bg-[#e7efe6] active:cursor-grabbing"
         onPointerDown={(event) => {
           drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY, ox: photo.x, oy: photo.y };
           try {

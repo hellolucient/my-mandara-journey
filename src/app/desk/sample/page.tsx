@@ -14,7 +14,7 @@ export default function SamplePage() {
           <p className="text-[11px] tracking-[0.18em] text-[#6d6458] uppercase">Sample data</p>
           <h1 className="font-display text-5xl text-[#1a3f36]">Novita</h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#5e6b64]">
-            One A5 side, the way it would sit on the wall. The illustrations stand in for photographs. Copy it onto your desk to replace them and to frame each picture.
+            One landscape A5 side, the way it would sit on the wall. The illustrations stand in for photographs. An empty frame on a real card is filled the same way.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

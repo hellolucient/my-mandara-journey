@@ -31,7 +31,7 @@ export default async function HomePage() {
         </p>
         <div className="mt-8 max-w-md">{firstDesk ? <SetupForm /> : <LoginForm />}</div>
       </section>
-      <section className="mx-auto w-full min-w-0 max-w-xl">
+      <section className="mx-auto w-full min-w-0">
         <p className="mb-2 text-[11px] tracking-[0.18em] text-[#6d6458] uppercase">Sample wall card</p>
         <SheetScaler>
           <CardFront story={sampleStory} sample />

@@ -21,7 +21,7 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
           <p className="text-[11px] tracking-[0.18em] text-[#6d6458] uppercase">A5 story card</p>
           <h1 className="font-display text-5xl text-[#1a3f36]">{story.name}</h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#5e6b64]">
-            One A5 side for the wall: name, quote, photographs, the map, and the timeline. Print, choose A5, and turn on background graphics.
+            One landscape A5 side for the wall: name, story, photographs, the map, and the timeline. Print, choose A5 landscape, and turn on background graphics.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

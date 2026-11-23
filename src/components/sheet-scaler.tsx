@@ -2,8 +2,8 @@
 
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
-const SHEET_WIDTH = (148 * 96) / 25.4;
-const SHEET_HEIGHT = (210 * 96) / 25.4;
+const SHEET_WIDTH = (210 * 96) / 25.4;
+const SHEET_HEIGHT = (148 * 96) / 25.4;
 
 export function SheetScaler({ children }: { children: ReactNode }) {
   const frame = useRef<HTMLDivElement>(null);
