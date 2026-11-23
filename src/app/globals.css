@@ -140,10 +140,6 @@
   color: #1c3330;
 }
 
-.journey-route {
-  stroke-dasharray: 1.5 9;
-}
-
 @media screen {
   .a5-sheet {
     box-shadow: 0 22px 50px rgba(70, 48, 24, 0.12);

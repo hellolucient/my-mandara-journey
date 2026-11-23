@@ -1,6 +1,6 @@
 # Mandara journeys
 
-Spa managers sign in, write a short story for someone on their team, and print it as a landscape A5 card. The card is a single sheet for the wall: three photographs, the name, the resort, how long they have been with Mandara, a quote, then the map, the story, and a timeline that reads across. Drag each photograph to choose the part that shows. Empty frames are filled with a colour block.
+Spa managers sign in, write a short story for someone on their team, and print it as a landscape A5 card. The card is a single sheet for the wall: three photographs, the name, the resort, how long they have been with Mandara, a quote, the story, and a timeline that reads across. Drag each photograph to choose the part that shows. Empty frames are filled with a colour block.
 
 ## First visit
 
@@ -14,13 +14,11 @@ Passwords are stored scrambled. A new login’s password is shown once, when you
 2. Enter her name, role, current property, and when she joined Mandara.
 3. Paste a quote.
 4. Add up to three photographs. Each one is reduced to under 300 KB, which is enough for a sharp print at this size.
-5. Add the timeline, in order. Pick a place when it should appear on the map.
+5. Add the timeline, in order. Pick a place when you want it named on that moment.
 6. **Draft from the timeline**, then edit the paragraph so it sounds like her.
 7. **Save and open the card**. Print it, choose **A5 landscape**, and turn on background graphics. The sheet is one side.
 
 **Sample card** shows a finished example. **Copy onto my desk** starts an editable copy without the sample illustrations, so you can add real photographs.
-
-The map covers the Indian Ocean and Southeast Asia (Bali, the Maldives, Thailand, Sri Lanka, Singapore, Jakarta, and a few neighbours). A moment with no pin still prints on the timeline.
 
 ## Run it locally
 
@@ -33,4 +31,4 @@ Open the address Next prints. Locally, stories are kept in a small database file
 
 ## Print
 
-The card is one sheet of 210 × 148 mm (A5 landscape). In the print dialog, set the paper size to A5 landscape and enable background graphics so the cream paper and the map print.
+The card is one sheet of 210 × 148 mm (A5 landscape). In the print dialog, set the paper size to A5 landscape and enable background graphics so the cream paper and the photographs print.

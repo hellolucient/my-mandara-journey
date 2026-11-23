@@ -249,28 +249,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
                 className="h-11 bg-[#f7f3ea]"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="placeId">Pin on the map</Label>
-              <select
-                id="placeId"
-                name="placeId"
-                value={placeId}
-                onChange={(event) => {
-                  const next = event.target.value;
-                  setPlaceId(next);
-                  const place = placeById(next);
-                  if (place && !locationLabel) setLocationLabel(place.short);
-                }}
-                className="h-11 w-full rounded-lg border border-[#ddcfba] bg-[#f7f3ea] px-3 text-sm"
-              >
-                <option value="">Not on the map</option>
-                {PLACES.map((place) => (
-                  <option key={place.id} value={place.id}>
-                    {place.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <input type="hidden" name="placeId" value={placeId} />
             <div className="space-y-1.5">
               <Label htmlFor="sinceLabel">With Mandara since</Label>
               <Input
@@ -348,7 +327,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
             <h2 className="font-display text-3xl text-[#1a3f36]">Timeline</h2>
             <p className="mt-1 text-sm leading-relaxed text-[#5e6b64]">
               Month and year only. When they started training, each place they worked, what they achieved, and what is next.
-              The map draws a line through the places, in this order. On the card they read across, under the map and the story.
+              On the card they read across, under the story.
             </p>
           </div>
           <ol className="space-y-4">
@@ -428,7 +407,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Where, on the map</Label>
+                    <Label>Where</Label>
                     <select
                       value={event.placeId}
                       onChange={(change) => {
@@ -443,7 +422,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
                       }}
                       className="h-10 w-full rounded-lg border border-[#ddcfba] bg-white px-3 text-sm"
                     >
-                      <option value="">No pin</option>
+                      <option value="">Leave blank</option>
                       {PLACES.map((place) => (
                         <option key={place.id} value={place.id}>
                           {place.name}
@@ -483,7 +462,7 @@ export function StoryForm({ initial }: { initial: Draft }) {
             <div>
               <h2 className="font-display text-3xl text-[#1a3f36]">The paragraph</h2>
               <p className="mt-1 text-sm text-[#5e6b64]">
-                This is the story printed on the card, next to the map. About 700 characters fit.
+                This is the story printed on the card, under the quote. About six lines fit.
               </p>
             </div>
             <Button
