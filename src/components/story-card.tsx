@@ -2,7 +2,10 @@ import { FramedPhoto } from "@/components/framed-photo";
 import { JourneyMap } from "@/components/journey-map";
 import { Mark } from "@/components/mark";
 import { SheetScaler } from "@/components/sheet-scaler";
+import { TeamHand } from "@/components/team-hand";
 import { DOT_COLORS, formatEventDate, formatSince, type Story, type StoryEvent, type StoryPhoto } from "@/lib/types";
+
+export type CardTreatment = "map" | "hand" | "type";
 
 const FILLERS = ["/sample/garden.svg", "/sample/gathering.svg", "/sample/shore.svg"];
 
@@ -68,13 +71,51 @@ function Timeline({ events }: { events: StoryEvent[] }) {
   );
 }
 
-export function CardFront({ story, sample = false }: { story: Story; sample?: boolean }) {
+function BesideCopy({
+  name,
+  meta,
+  since,
+  quote,
+  narrative,
+}: {
+  name: string;
+  meta: string;
+  since: string;
+  quote: string;
+  narrative: string;
+}) {
+  return (
+    <div className="col-span-2 flex min-h-0 flex-col justify-center px-2 text-center">
+      <h2 className={`font-display leading-none text-[#1a3f36] ${name.length > 18 ? "text-[1.35rem]" : "text-[1.7rem]"}`}>{name}</h2>
+      {meta ? <p className="mt-1 text-[9px] tracking-[0.16em] text-[#3d4f48] uppercase">{meta}</p> : null}
+      {since ? <p className="font-serif mt-0.5 text-[11px] text-[#8a623c] italic">With Mandara since {since}</p> : null}
+      {quote ? (
+        <blockquote className="font-serif mt-1 text-[16px] leading-snug font-semibold text-[#1e4038] italic" style={clampLines(2)}>
+          “{quote}
+        </blockquote>
+      ) : (
+        <p className="font-serif mt-1 text-[16px] font-semibold text-[#7a6d5e] italic">A quote sits here.</p>
+      )}
+      {narrative ? (
+        <p className="font-serif mt-1.5 text-left text-[11px] leading-snug text-[#243833]" style={clampLines(5)}>
+          {narrative}
+        </p>
+      ) : (
+        <p className="font-serif mt-1.5 text-[11px] text-[#7a6d5e] italic">The story sits here.</p>
+      )}
+    </div>
+  );
+}
+
+export function CardFront({ story, sample = false, treatment = "map" }: { story: Story; sample?: boolean; treatment?: CardTreatment }) {
   const name = story.name.trim() || "Name";
   const property = story.propertyName.trim();
   const location = story.locationLabel.trim();
   const showLocation = location && !property.toLowerCase().includes(location.toLowerCase());
   const meta = [property, showLocation ? location : ""].filter(Boolean).join("  ·  ");
   const since = formatSince(story.sinceLabel);
+  const quote = story.quote.trim();
+  const narrative = story.narrative.trim();
   return (
     <article className="a5-sheet relative flex flex-col px-[5.5mm] pt-[3mm] pb-[3mm] text-center text-[#1c3330]">
       {sample ? (
@@ -88,36 +129,49 @@ export function CardFront({ story, sample = false }: { story: Story; sample?: bo
         Our Mandara journey
       </p>
 
-      <div className="mt-1.5 grid flex-1 grid-cols-3 content-start gap-x-1.5 gap-y-1.5">
-        {Array.from({ length: 3 }, (_, index) => (
-          <PhotoSlot key={index} photo={story.photos[index] ?? null} index={index} />
-        ))}
+      {treatment === "type" ? (
+        <>
+          <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+            {Array.from({ length: 3 }, (_, index) => (
+              <PhotoSlot key={index} photo={story.photos[index] ?? null} index={index} />
+            ))}
+          </div>
+          <div className="flex flex-1 flex-col justify-center px-[1mm] py-1 text-center">
+            <h2 className={`font-display leading-none text-[#1a3f36] ${name.length > 18 ? "text-[1.7rem]" : "text-[2.15rem]"}`}>{name}</h2>
+            {meta ? <p className="mt-1.5 text-[12px] tracking-[0.16em] text-[#3d4f48] uppercase">{meta}</p> : null}
+            {since ? <p className="font-serif mt-1 text-[13px] text-[#8a623c] italic">With Mandara since {since}</p> : null}
+            {quote ? (
+              <blockquote className="font-serif mt-2 text-[18px] leading-snug font-semibold text-[#1e4038] italic" style={clampLines(3)}>
+                “{quote}
+              </blockquote>
+            ) : (
+              <p className="font-serif mt-2 text-[18px] font-semibold text-[#7a6d5e] italic">A quote sits here.</p>
+            )}
+            {narrative ? (
+              <p className="font-serif mt-2 text-left text-[13px] leading-snug text-[#243833]" style={clampLines(6)}>
+                {narrative}
+              </p>
+            ) : (
+              <p className="font-serif mt-2 text-[13px] text-[#7a6d5e] italic">The story sits here.</p>
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="mt-1.5 grid flex-1 grid-cols-3 content-start gap-x-1.5 gap-y-1.5">
+          {Array.from({ length: 3 }, (_, index) => (
+            <PhotoSlot key={index} photo={story.photos[index] ?? null} index={index} />
+          ))}
 
-        <div className="aspect-[4/3] self-start overflow-hidden rounded-xl bg-[#d5e3dc]">
-          <JourneyMap story={story} />
-        </div>
-        <div className="col-span-2 flex min-h-0 flex-col justify-center px-2 text-center">
-          <h2 className={`font-display leading-none text-[#1a3f36] ${name.length > 18 ? "text-[1.35rem]" : "text-[1.7rem]"}`}>
-            {name}
-          </h2>
-          {meta ? <p className="mt-1 text-[9px] tracking-[0.16em] text-[#3d4f48] uppercase">{meta}</p> : null}
-          {since ? <p className="font-serif mt-0.5 text-[11px] text-[#8a623c] italic">With Mandara since {since}</p> : null}
-          {story.quote ? (
-            <blockquote className="font-serif mt-1 text-[16px] leading-snug font-semibold text-[#1e4038] italic" style={clampLines(2)}>
-              “{story.quote}
-            </blockquote>
+          {treatment === "hand" ? (
+            <TeamHand />
           ) : (
-            <p className="font-serif mt-1 text-[16px] font-semibold text-[#7a6d5e] italic">A quote sits here.</p>
+            <div className="aspect-[4/3] self-start overflow-hidden rounded-xl bg-[#d5e3dc]">
+              <JourneyMap story={story} />
+            </div>
           )}
-          {story.narrative.trim() ? (
-            <p className="font-serif mt-1.5 text-left text-[11px] leading-snug text-[#243833]" style={clampLines(5)}>
-              {story.narrative}
-            </p>
-          ) : (
-            <p className="font-serif mt-1.5 text-[11px] text-[#7a6d5e] italic">The story sits here.</p>
-          )}
+          <BesideCopy name={name} meta={meta} since={since} quote={quote} narrative={narrative} />
         </div>
-      </div>
+      )}
 
       <div className="mt-1.5 shrink-0">
         {story.events.length > 0 ? (
